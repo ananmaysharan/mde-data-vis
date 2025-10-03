@@ -2,6 +2,8 @@
 
 ## Running Locally
 
+Make sure you have Node.js installed. 
+
 Install dependencies with `npm install`, then:
 
 ```sh
