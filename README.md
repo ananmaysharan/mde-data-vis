@@ -2,7 +2,7 @@
 
 ## Running Locally
 
-Installed dependencies with `npm install`, then:
+Install dependencies with `npm install`, then:
 
 ```sh
 npm run dev
