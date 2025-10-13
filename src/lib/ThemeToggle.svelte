@@ -22,7 +22,7 @@
 			on:change={handleThemeChange}
 		/>
 		<label for="dark" title="Dark theme">
-			<span aria-hidden="true">🌙</span>
+			<span aria-hidden="true"><iconify-icon icon="lucide:moon"></iconify-icon></span>
 		</label>
 
 		<!-- Light -->
@@ -35,7 +35,7 @@
 			on:change={handleThemeChange}
 		/>
 		<label for="light" title="Light theme">
-			<span aria-hidden="true">☀️</span>
+			<span aria-hidden="true"><iconify-icon icon="lucide:sun"></iconify-icon></span>
 		</label>
 
 		<!-- Blue -->
@@ -48,7 +48,7 @@
 			on:change={handleThemeChange}
 		/>
 		<label for="blue" title="Blue theme">
-			<span aria-hidden="true">🌊</span>
+			<span aria-hidden="true"><iconify-icon icon="ic:round-water"></iconify-icon></span>
 		</label>
 	</div>
 </div>
@@ -56,19 +56,22 @@
 <style>
 	.theme-toggle-container {
 		position: fixed;
-		top: 1rem;
-		right: 1rem;
-		z-index: 50;
+		top: 1.5rem;
+		right: 4rem;
+		z-index: 2;
 	}
 
 	.toggle-group {
 		display: inline-flex;
-		border-radius: 0.5rem;
-		border: 1px solid var(--border-subtle);
-		background: var(--surface-3);
+		border-radius: 0.25rem;
+		background: var(--surface-1);
 		backdrop-filter: blur(12px);
-		overflow: hidden;
+		height: 2rem;
+		width: auto;
+		padding: 0.125rem;
+		gap: 0.125rem;
 		transition: all 0.2s ease;
+		border: 1px solid var(--border-subtle);
 	}
 
 	.toggle-group input[type='radio'] {
@@ -81,33 +84,35 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		padding: 0.5rem;
+		padding: 0 0.5rem;
 		cursor: pointer;
 		color: var(--text-secondary);
 		background: transparent;
 		transition: all 0.2s ease;
-		border-right: 1px solid var(--border-subtle);
-		min-width: 3rem;
-	}
-
-	.toggle-group label:last-child {
-		border-right: none;
+		border-radius: 0.125rem;
+		min-width: 2rem;
+		height: 100%;
 	}
 
 	.toggle-group label:hover {
-		background: var(--surface-2);
+		background: var(--accent);
 		color: var(--text-primary);
 	}
 
 	.toggle-group input[type='radio']:checked + label {
 		background: var(--accent);
-		color: var(--text-on-accent, #fff);
+		color: var(--text-primary);
 		font-weight: 600;
+		box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 	}
 
 	.toggle-group input[type='radio']:focus-visible + label {
 		outline: 2px solid var(--accent);
 		outline-offset: -2px;
 		z-index: 1;
+	}
+
+	.toggle-group label iconify-icon {
+		font-size: 0.875rem;
 	}
 </style>

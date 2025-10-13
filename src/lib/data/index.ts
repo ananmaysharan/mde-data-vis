@@ -3,14 +3,16 @@ import sensorsGeo from '$lib/assets/sensors.geo.json';
 
 export const SOUND_TYPE_COLORS = {
 	ships: '#E44000',
-	explosions: '#EB7E18',
-	bluewhale: '#64B3B7',
-	finwhale: '#1897EB',
-	humpbackwhale: '#E5AA00',
-	dolphins: '#ED7BCD',
-	bocaccio: '#8964B7',
-	plainfinmidshipman: '#81C995'
+	explosions: '#FE7C1F',
+	bluewhale: '#73CBE9',
+	finwhale: '#E5AA00',
+	humpbackwhale: '#E656E1',
+	dolphins: '#81C995',
+	bocaccio: '#9F6FF8',
+	plainfinmidshipman: '#81C995',
 } as const;
+
+export type SoundType = keyof typeof SOUND_TYPE_COLORS;
 
 export const METRIC_COLUMNS = [
 	'sonar',

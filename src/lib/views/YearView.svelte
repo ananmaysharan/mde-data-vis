@@ -6,10 +6,12 @@
     import { onMount, onDestroy } from 'svelte';
     import { select } from 'd3-selection';
     import LegendItem from '../LegendItem.svelte';
+    import LegendGraphic from '../components/LegendGraphic.svelte';
     import { getMonthSummary } from '$lib/data';
     import { selectedSensor, selectedMonth, selectedYear, goToMonth, setYear } from '$lib/state/navigation';
     import { get } from 'svelte/store';
     import { playSound, stopSound, stopAllSounds } from '$lib/utils/soundEffects';
+    import { setSoundHighlight, clearSoundHighlight } from '$lib/state/audio';
 
     let Flip;
     let data = [];
@@ -20,6 +22,7 @@
     let monthTooltipSelection;
     let unsubscribeSensor;
     let showLabels = true;
+    let legendVariant = 'year';
     let fadeOutLabels = false;
     let activeCircleElement = null;
     let activeCircleSoundType = null;
@@ -66,6 +69,7 @@
         stopAllSounds();
         activeCircleElement = null;
         activeCircleSoundType = null;
+        clearSoundHighlight();
     });
 
     async function loadData(sensorId) {
@@ -86,6 +90,7 @@
             stopAllSounds();
             activeCircleElement = null;
             activeCircleSoundType = null;
+            clearSoundHighlight();
         } catch (error) {
             console.error('Failed to load month summary', error);
             data = [];
@@ -223,6 +228,7 @@
         activeCircleElement = event.currentTarget;
         activeCircleSoundType = soundType;
         playSound(soundType);
+        setSoundHighlight(soundType);
         showTooltip(event, soundType, value, label);
     }
 
@@ -235,6 +241,7 @@
             activeCircleElement = null;
             activeCircleSoundType = null;
             stopSound(soundType);
+            clearSoundHighlight();
         }
         hideTooltip();
     }
@@ -353,6 +360,7 @@
         stopAllSounds();
         activeCircleElement = null;
         activeCircleSoundType = null;
+        clearSoundHighlight();
     }
 
     $: if (layout !== 'row') {
@@ -366,6 +374,8 @@
     $: if ($selectedMonth === null && layout !== 'grid') {
         changeLayout('grid');
     }
+
+    $: legendVariant = $selectedMonth !== null ? 'month' : 'year';
 
     function parseRowDate(row) {
         if (!row || !row.time) return null;
@@ -409,6 +419,9 @@
         <LegendItem type="bocaccio" status="Vulnerable" />
         <LegendItem type="dolphins" status="Vulnerable" />
     </div>
+        <div class="legend-info">
+            <LegendGraphic variant={legendVariant} />
+        </div>
 </div>
 
 <div class="visualization-wrapper">
@@ -479,7 +492,7 @@
 <style>
     .legend {
         display: flex;
-        flex-wrap: wrap;
+        /* flex-wrap: wrap; */
         align-items: center;
         gap: 1rem;
         margin-bottom: 1rem;
@@ -490,7 +503,14 @@
     .legend-items {
         display: flex;
         /* flex-wrap: wrap; */
-        /* gap: 1rem; */
+        gap: 1rem;
+        margin: 0 1rem 0 2rem;
+    }
+
+    .legend-info {
+        /* margin-left: auto; */
+        min-width: 100px;
+        margin-top: 3rem;
     }
 
     .visualization-wrapper {
@@ -629,15 +649,17 @@
 
     :global(.circle-tooltip) {
         z-index: 10;
-        background: rgba(34, 34, 34, 0.95);
-        color: #fff;
+        background: var(--surface-overlay);
+        border: 1px solid var(--border-subtle);
+        font-family: var(--font-mono, monospace);
+        color: var(--text-primary);
         padding: 0.5rem 0.75rem;
         border-radius: 0.5rem;
         display: flex;
         flex-direction: column;
         gap: 0.2rem;
         font-size: 0.75rem;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        /* box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); */
         transition: opacity 0.15s ease;
         opacity: 1;
         max-width: 12rem;
@@ -656,7 +678,7 @@
     :global(.tooltip-type) {
         font-size: 0.7rem;
         text-transform: capitalize;
-        color: rgba(255, 255, 255, 0.7);
+        color: var(--text-secondary);
     }
 
     :global(.tooltip-value) {
@@ -666,15 +688,17 @@
 
     :global(.month-tooltip) {
         z-index: 10;
-        background: rgba(34, 34, 34, 0.95);
-        color: #fff;
+        background: var(--surface-overlay);
+        border: 1px solid var(--border-subtle);
+        font-family: var(--font-mono, monospace);
+        color: var(--text-primary);
         padding: 0.5rem 0.75rem;
         border-radius: 0.5rem;
         display: flex;
         flex-direction: column;
         gap: 0.2rem;
         font-size: 0.75rem;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        /* box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); */
         transition: opacity 0.15s ease;
         opacity: 1;
         max-width: 12rem;

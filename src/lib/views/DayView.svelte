@@ -29,7 +29,8 @@
     weekday: 'long',
     year: 'numeric',
     month: 'long',
-    day: 'numeric'
+    day: 'numeric',
+    timeZone: 'UTC'
   });
 
   const audioAssetUrl = new URL('../assets/enhanced_combined_bluefin_integratedv3_200914.wav', import.meta.url).href;
@@ -843,9 +844,12 @@
     gap: 1rem;
   }
 
-  .legend-items {
-    display: flex;
-  }
+    .legend-items {
+        display: flex;
+        /* flex-wrap: wrap; */
+        gap: 1rem;
+        margin: 0 1rem 0 2rem;
+    }
 
   .sketch-canvas {
     width: 100%;

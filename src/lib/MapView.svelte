@@ -4,6 +4,7 @@
 	import { get } from 'svelte/store';
 	import gsap from 'gsap';
 	import mapboxgl from 'mapbox-gl';
+	import "iconify-icon";
 	import 'mapbox-gl/dist/mapbox-gl.css';
 	import { fade } from 'svelte/transition';
 	import sensorsGeo from '$lib/assets/sensors.geo.json';
@@ -24,6 +25,7 @@
 		type ShippingTripsDataset
 	} from '$lib/data/shippingTrips';
 	import DayCardPreview from './components/DayCardPreview.svelte';
+	import PerchAnalysisChart from './components/PerchAnalysisChart.svelte';
 	import type { DayCardPreviewData } from '$lib/types/day-card';
 
     let Flip: any;
@@ -49,14 +51,18 @@
 	}
 
 	const MAP_STYLES: Record<ThemeId, string> = {
-		dark: 'mapbox://styles/mapbox/satellite-streets-v12',
-		light: 'mapbox://styles/ananmay/cmg5ux9ie005v01qib744fnsn',
+		dark: 'mapbox://styles/mapbox/dark-v11',
+		light: 'mapbox://styles/mapbox/light-v11',
 		blue: 'mapbox://styles/ananmay/cmg5utiiy000x01qw2d2f1r7s'
 	};
 
+	const INTRO_SPIN_SECONDS_PER_REVOLUTION = 90;
+	const INTRO_SPIN_MAX_ZOOM = 5;
+	const INTRO_SPIN_SLOW_ZOOM = 3;
+
 	const INTRO_CAMERA = {
-		center: [80, 36] as [number, number],
-		zoom: 0,
+		center: [-101, 70] as [number, number],
+		zoom: 0.55,
 		pitch: 0,
 		bearing: 0
 	};
@@ -79,8 +85,8 @@
 
 	const SHIP_TRAIL_LENGTH = 10800;
 	const SHIP_LOOP_DURATION_MS = 1_200_000; // 20 minutes for a full loop
-	const SHIP_LOOP_START_DATE = new Date('2020-01-01T00:00:00Z');
-	const SHIP_LOOP_END_DATE = new Date('2020-12-31T23:00:00Z');
+	const SHIP_LOOP_START_DATE = new Date('2018-11-01T00:00:00Z');
+	const SHIP_LOOP_END_DATE = new Date('2021-11-31T23:00:00Z');
 	const SHIP_PROGRESS_STEP = 5;
 	const HOUR_IN_MS = 60 * 60 * 1000;
 	const SHIP_LOOP_RANGE_MS = Math.max(0, SHIP_LOOP_END_DATE.getTime() - SHIP_LOOP_START_DATE.getTime());
@@ -99,12 +105,13 @@
 		timeZone: 'UTC'
 	});
 
-	const dayOverlayFormatter = new Intl.DateTimeFormat(undefined, {
-		weekday: 'long',
-		year: 'numeric',
-		month: 'long',
-		day: 'numeric'
-	});
+const dayOverlayFormatter = new Intl.DateTimeFormat(undefined, {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    timeZone: 'UTC'
+});
 
 	const sensorsData: FeatureCollection<Point, { sensorId: string; label?: string; popup?: string | null }> = {
 		type: 'FeatureCollection',
@@ -151,6 +158,8 @@
 	let isTransitioning = false;
 	let dayOverlayCard: DayCardPreviewData | null = null;
 	let dayOverlayLabel: string | null = null;
+	let introSpinEnabled = false;
+	let introUserInteracting = false;
 
     onMount(async () => {
         const FlipModule = await import('gsap/Flip');
@@ -204,6 +213,7 @@
 			handleStyleLoad();
 			if (mode === 'intro') {
 				showEnterButton = true;
+				startIntroSpin();
 			}
 			preloadShippingTrips();
 			if (currentMode === 'sidebar') {
@@ -211,6 +221,14 @@
 			}
 		});
 		map.on('style.load', handleStyleLoad);
+		map.on('mousedown', handleIntroInteractionStart);
+		map.on('touchstart', handleIntroInteractionStart);
+		map.on('mouseup', handleIntroInteractionEnd);
+		map.on('touchend', handleIntroInteractionEnd);
+		map.on('dragend', handleIntroInteractionEnd);
+		map.on('pitchend', handleIntroInteractionEnd);
+		map.on('rotateend', handleIntroInteractionEnd);
+		map.on('moveend', handleIntroMoveEnd);
 		return () => {
 			cleanup();
 		};
@@ -251,6 +269,7 @@
 		
 		isTransitioning = true;
 		showEnterButton = false;
+		stopIntroSpin();
 
 		// First zoom to the site
 		map.flyTo({
@@ -309,6 +328,7 @@
 					map.jumpTo(INTRO_CAMERA);
 				}
 			}
+			startIntroSpin();
 		} else {
 			showEnterButton = false;
 			if (!isTransitioning) {
@@ -320,6 +340,7 @@
 				}
 				animateContainer(nextMode, animate);
 			}
+			stopIntroSpin();
 		}
 
 		if (nextMode === 'sidebar') {
@@ -367,6 +388,8 @@
 		updateSensorLayer();
 		if (currentMode === 'sidebar') {
 			void activateShippingLayer({ force: true });
+		} else {
+			startIntroSpin();
 		}
 	}
 
@@ -391,6 +414,7 @@
 				type: 'circle',
 				source: sourceId,
 				paint: buildSensorPaint(activeSensorId),
+				minzoom: 3,
 			};
 			map.addLayer(layer);
 		}
@@ -670,11 +694,21 @@
 			map.off('click', layerId, handleSensorClick);
 			map.off('mouseenter', layerId, handleSensorEnter);
 			map.off('mouseleave', layerId, handleSensorLeave);
+			map.off('mousedown', handleIntroInteractionStart);
+			map.off('touchstart', handleIntroInteractionStart);
+			map.off('mouseup', handleIntroInteractionEnd);
+			map.off('touchend', handleIntroInteractionEnd);
+			map.off('dragend', handleIntroInteractionEnd);
+			map.off('pitchend', handleIntroInteractionEnd);
+			map.off('rotateend', handleIntroInteractionEnd);
+			map.off('moveend', handleIntroMoveEnd);
 			map.remove();
 		}
 		map = null;
 		mapReady = false;
 		isTransitioning = false;
+		introSpinEnabled = false;
+		introUserInteracting = false;
 	}
 
 	function handleSensorClick(event: SensorLayerMouseEvent) {
@@ -693,13 +727,60 @@
 		map?.getCanvas().classList.remove('cursor-pointer');
 	}
 
-    	function updateMapStyle(nextTheme: ThemeId) {
-		if (!map) return;
-		const targetStyle = MAP_STYLES[nextTheme] ?? MAP_STYLES.dark;
-		if (currentStyleUrl === targetStyle) return;
-		map.setStyle(targetStyle);
-		currentStyleUrl = targetStyle;
-	}
+		function updateMapStyle(nextTheme: ThemeId) {
+			if (!map) return;
+			const targetStyle = MAP_STYLES[nextTheme] ?? MAP_STYLES.dark;
+			if (currentStyleUrl === targetStyle) return;
+			map.setStyle(targetStyle);
+			currentStyleUrl = targetStyle;
+		}
+
+		function spinIntroGlobe() {
+			if (!map || !introSpinEnabled || introUserInteracting || currentMode !== 'intro') return;
+			const zoom = map.getZoom();
+			if (zoom >= INTRO_SPIN_MAX_ZOOM) return;
+			let distancePerSecond = 360 / INTRO_SPIN_SECONDS_PER_REVOLUTION;
+			if (zoom > INTRO_SPIN_SLOW_ZOOM) {
+				const zoomDiff = (INTRO_SPIN_MAX_ZOOM - zoom) / (INTRO_SPIN_MAX_ZOOM - INTRO_SPIN_SLOW_ZOOM);
+				distancePerSecond *= Math.max(zoomDiff, 0);
+			}
+			const center = map.getCenter();
+			center.lng -= distancePerSecond;
+			map.easeTo({ center, duration: 1_000, easing: (n) => n });
+		}
+
+		function startIntroSpin() {
+			if (!browser || !map || currentMode !== 'intro') return;
+			introSpinEnabled = true;
+			introUserInteracting = false;
+			// Avoid re-triggering during transitions
+			if (!map?.isMoving()) {
+				spinIntroGlobe();
+			}
+		}
+
+		function stopIntroSpin() {
+			introSpinEnabled = false;
+			introUserInteracting = false;
+			map?.stop();
+		}
+
+		function handleIntroInteractionStart() {
+			if (currentMode !== 'intro') return;
+			introUserInteracting = true;
+			map?.stop();
+		}
+
+		function handleIntroInteractionEnd() {
+			if (currentMode !== 'intro') return;
+			introUserInteracting = false;
+			spinIntroGlobe();
+		}
+
+		function handleIntroMoveEnd() {
+			if (currentMode !== 'intro') return;
+			spinIntroGlobe();
+		}
 </script>
 
 <svelte:window on:resize={() => map?.resize()} />
@@ -707,13 +788,21 @@
 <div class="map-root" data-mode={mode}>
 	<div class="map-container" bind:this={mapContainer}></div>
 
+	{#if mode === 'sidebar'}
+		<div class="map-gradient-overlay"></div>
+	{/if}
+
 	{#if mode === 'intro' && showEnterButton}
 		<div class="enter-overlay" transition:fade={{ duration: ENTER_TRANSITION_DURATION }}>
-        <h1 class="text-8xl font-semibold text-text-primary">Ocean Records</h1>
-			<button class="enter-button font-mono" type="button" on:click={handleEnterClick}>
-				Explore
+		<div class="flex flex-col items-center gap-6">
+        <h1 class="text-8xl font-semibold font-mono text-text-primary">Ocean Records</h1>
+				<h5 class="text-text-primary font-mono text-2xl">Biophony & Anthrophony in Monterey Bay</h5>
+		</div>
+			<button class="enter-button flex align-center" type="button" on:click={handleEnterClick}>
+				Explore <iconify-icon icon="mdi:arrow-right"></iconify-icon>
 			</button>
 		</div>
+
 	{/if}
 
 	{#if mode === 'sidebar' && $selectedDay}
@@ -727,6 +816,7 @@
 				{#if dayOverlayCard}
 					<DayCardPreview card={dayOverlayCard} />
 				{/if}
+				<PerchAnalysisChart />
 			</div>
 		</div>
 	{/if}
@@ -781,6 +871,18 @@
 		border-radius: inherit;
 	}
 
+	.map-gradient-overlay {
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		height: 35rem;
+		background: linear-gradient(to bottom, var(--surface-1) 0%, rgba(0, 0, 0, 0) 100%);
+		pointer-events: none;
+		z-index: 5;
+		opacity: 1;
+	}
+
 	.enter-overlay {
 		position: absolute;
 		inset: 0;
@@ -796,7 +898,7 @@
 	.enter-button {
 		pointer-events: auto;
 		padding: 0.75rem 2.5rem;
-		border-radius: 999px;
+		border-radius: 10em;
 		border: none;
 		font-size: 1rem;
 		font-weight: 500;
@@ -807,6 +909,9 @@
 		/* box-shadow: var(--shadow-elevated, 0 12px 24px rgba(0, 0, 0, 0.18)); */
 		cursor: pointer;
 		transition: transform 200ms ease, box-shadow 200ms ease;
+		align-items: center;
+		gap: 0.5rem;
+		display: flex;
 	}
 
 	.enter-button:hover {
@@ -887,6 +992,9 @@
 		pointer-events: auto;
 		max-width: min(480px, 90vw);
 		margin-top: 13rem;
+		border: 1px solid var(--border-subtle);
+		padding: 1.5rem;
+		border-radius: 0.5rem;
 	}
 
 	.day-header {

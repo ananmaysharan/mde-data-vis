@@ -2,6 +2,7 @@
     // @ts-nocheck
     
     import { playSound, stopSound } from '$lib/utils/soundEffects';
+    import { setSoundHighlight, clearSoundHighlight } from '$lib/state/audio';
 
     /**
      * @type {'ships' | 'bluewhale' | 'finwhale' | 'humpbackwhale' | 'dolphins' | 'bocaccio' | 'explosions'}
@@ -62,14 +63,15 @@
     role="button"
     tabindex="0"
     aria-label={`Play ${displayName} sound`}
-    on:mouseenter={() => playSound(type)}
-    on:focus={() => playSound(type)}
-    on:mouseleave={() => stopSound(type)}
-    on:blur={() => stopSound(type)}
+    on:mouseenter={() => { playSound(type); setSoundHighlight(type); }}
+    on:focus={() => { playSound(type); setSoundHighlight(type); }}
+    on:mouseleave={() => { stopSound(type); clearSoundHighlight(); }}
+    on:blur={() => { stopSound(type); clearSoundHighlight(); }}
     on:keydown={(event) => {
         if (event.key === 'Enter' || event.key === ' ') {
             event.preventDefault();
             playSound(type);
+            setSoundHighlight(type);
         }
     }}
 >
@@ -89,7 +91,7 @@
         display: inline-flex;
         flex-direction: column;
         align-items: center;
-        padding: 1rem;
+        padding: 2rem 0 1rem;
     }
     
     .content {

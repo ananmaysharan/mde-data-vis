@@ -2,6 +2,8 @@
     // @ts-nocheck
     import { onMount, onDestroy } from 'svelte';
     import { frequencyData, timeDomainData, isPlaying } from '$lib/utils/soundEffects';
+    import { SOUND_TYPE_COLORS } from '$lib/data';
+    import { soundHighlight } from '$lib/state/audio';
     
     let canvas;
     let ctx;
@@ -9,6 +11,7 @@
     let currentFrequencyData = new Uint8Array(0);
     let currentTimeData = new Uint8Array(0);
     let playing = false;
+    let highlight = null;
     
     // Subscribe to stores
     const unsubscribeFrequency = frequencyData.subscribe(value => {
@@ -24,6 +27,10 @@
             startVisualization();
         }
     });
+
+    const unsubscribeHighlight = soundHighlight.subscribe((value) => {
+        highlight = value;
+    });
     
     onMount(() => {
         if (canvas) {
@@ -38,6 +45,7 @@
         unsubscribeFrequency();
         unsubscribeTime();
         unsubscribePlaying();
+        unsubscribeHighlight();
     });
     
     function resizeCanvas() {
@@ -72,10 +80,11 @@
         // Clear canvas
         ctx.clearRect(0, 0, width, height);
         
-        // Get accent color from CSS variable
-        const accentColor = getComputedStyle(document.documentElement)
-            .getPropertyValue('--accent')
+        // Resolve stroke color based on highlight or fallback to text color
+        const fallbackColor = getComputedStyle(document.documentElement)
+            .getPropertyValue('--text-primary')
             .trim() || '#21558d';
+        const accentColor = highlight ? SOUND_TYPE_COLORS[highlight] ?? fallbackColor : fallbackColor;
         
         // Draw line
         ctx.beginPath();

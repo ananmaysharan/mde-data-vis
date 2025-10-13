@@ -272,7 +272,7 @@
   }
 
   function buildPills(hours: HourDatum[]): PillDatum[] {
-    return hours
+    const pills = hours
       .filter(
         (hour) =>
           (hour.ships === 'detect' || hour.explosions === 'detect') &&
@@ -286,6 +286,11 @@
         }));
         return { hour: hour.hour, activeRows };
       });
+
+       console.log('Hours with overlap:', pills.length);
+
+      return pills;
+
   }
 
   function determineHasData(
@@ -533,6 +538,26 @@
               role="img"
               aria-label={`Timeline for ${card.label}`}
             >
+              <!-- Time labels -->
+              <text
+                x={hourToX(0)}
+                y={0}
+                text-anchor="middle"
+                class="time-label"
+              >0</text>
+              <text
+                x={hourToX(12)}
+                y={0}
+                text-anchor="middle"
+                class="time-label"
+              >12</text>
+              <text
+                x={hourToX(23)}
+                y={0}
+                text-anchor="middle"
+                class="time-label"
+              >24</text>
+
               {#if card.humpback !== 'missing'}
                 <rect
                   x={TIMELINE_MARGIN_LEFT}
@@ -715,6 +740,7 @@
     width: 100%;
     height: auto;
     display: block;
+    overflow: visible;
   }
 
   .bar.detect.humpback {
@@ -781,17 +807,26 @@
     opacity: 0.85;
   }
 
+  .time-label {
+    font-size: 2rem;
+    fill: var(--text-secondary, #94a3b8);
+    font-family: var(--font-mono, monospace);
+    opacity: 0.9;
+  }
+
   :global(.day-card-tooltip) {
     z-index: 10;
-    background: rgba(34, 34, 34, 0.95);
-    color: #fff;
+    background: var(--surface-overlay);
+    border: 1px solid var(--border-subtle);
+    font-family: var(--font-mono, monospace);
+    color: var(--text-primary);
     padding: 0.5rem 0.75rem;
     border-radius: 0.5rem;
     display: flex;
     flex-direction: column;
     gap: 0.2rem;
     font-size: 0.75rem;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    /* box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); */
     transition: opacity 0.15s ease;
     opacity: 1;
     max-width: 12rem;

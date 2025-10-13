@@ -4,14 +4,14 @@
 
 :root {
 	color-scheme: dark;
-	--surface-1: #0A132F;
+	--surface-1: rgb(10, 19, 47);
 	--surface-2: #0A132F;
-	--surface-3: #4989cd;
-	--surface-overlay: rgba(3, 23, 39, 0.85);
+	--surface-3: #0A132F;
+	--surface-overlay: rgba(10, 19, 47, 0.85);
 	--text-primary: #e9f2f7;
 	--text-secondary: #d0d6e0;
 	--border-subtle: rgba(143, 184, 214, 0.26);
-	--accent: #21558d;
+	--accent: #4989cd;
 	--accent-soft: rgba(24, 151, 235, 0.18);
 	--accent-strong: #fff;
 	--shadow-elevated: 0 20px 40px rgba(2, 22, 40, 0.5);
@@ -19,9 +19,9 @@
 
 [data-theme='dark'] {
 	color-scheme: dark;
-	--surface-1: #08090a;
-	--surface-2: #08090a;
-	--surface-3: #08090a;
+	--surface-1: #222;
+	--surface-2: #222;
+	--surface-3: #222;
 	--surface-overlay: rgba(12, 24, 39, 0.8);
 	--text-primary: #f7f8f8;
 	--text-secondary: #d0d6e0;
