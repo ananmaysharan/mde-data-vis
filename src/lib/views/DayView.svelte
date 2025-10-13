@@ -130,8 +130,8 @@
 
     const readThemeColors = () => ({
       background: readColorVariable('--surface-2', '#0A132F'),
-      quiet: readColorVariable('--border-subtle', 'rgba(10, 19, 47, 0)'),
-      ambient: readColorVariable('--accent', 'rgba(10, 19, 47, 0)'),
+      quiet: readColorVariable('--color-quiet', 'rgba(10, 19, 47, 0)'),
+      ambient: readColorVariable('--color-ambient', 'rgba(10, 19, 47, 0)'),
       text: readColorVariable('--text-secondary', '#CBD5E1'),
       frame: readColorVariable('--border-subtle', 'rgba(148, 163, 184, 0.4)')
     });
@@ -712,9 +712,9 @@
           let metric = ENERGY_GAIN * energyNorm + CHANGE_GAIN * changeNorm;
 
           if (above < NOISE_MARGIN && metric < TRIGGER) {
-            // p.stroke(palette.quiet);
-            // p.strokeWeight(1);
-            // p.point(x, y);
+            p.stroke(palette.quiet);
+            p.strokeWeight(1);
+            p.point(x, y);
             continue;
           }
 

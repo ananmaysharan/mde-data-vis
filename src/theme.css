@@ -15,6 +15,8 @@
 	--accent-soft: rgba(24, 151, 235, 0.18);
 	--accent-strong: #fff;
 	--shadow-elevated: 0 20px 40px rgba(2, 22, 40, 0.5);
+	--color-ambient: rgba(10, 19, 47, 0);
+	--color-quiet: rgba(10, 19, 47, 0);
 }
 
 [data-theme='dark'] {
