@@ -2,13 +2,13 @@
 import { writable } from 'svelte/store';
 
 const soundMap: Record<string, string> = {
-    ships: '/src/lib/assets/sounds/ship.wav',
-    bluewhale: '/src/lib/assets/sounds/bluewhale.wav',
-    finwhale: '/src/lib/assets/sounds/finwhale.wav',
-    humpbackwhale: '/src/lib/assets/sounds/humpback.wav',
-    dolphins: '/src/lib/assets/sounds/dolphin.wav',
-    bocaccio: '/src/lib/assets/sounds/bocaccio.wav',
-    explosions: '/src/lib/assets/sounds/explosion.wav',
+    ships: '/assets/sounds/ship.wav',
+    bluewhale: '/assets/sounds/bluewhale.wav',
+    finwhale: '/assets/sounds/finwhale.wav',
+    humpbackwhale: '/assets/sounds/humpback.wav',
+    dolphins: '/assets/sounds/dolphin.wav',
+    bocaccio: '/assets/sounds/bocaccio.wav',
+    explosions: '/assets/sounds/explosion.wav',
 };
 
 const activeAudios: Map<string, HTMLAudioElement> = new Map();

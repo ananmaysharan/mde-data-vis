@@ -286,9 +286,6 @@
         }));
         return { hour: hour.hour, activeRows };
       });
-
-       console.log('Hours with overlap:', pills.length);
-
       return pills;
 
   }
