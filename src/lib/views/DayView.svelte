@@ -33,8 +33,8 @@
     timeZone: 'UTC'
   });
 
-  const audioAssetUrl = new URL('../assets/enhanced_combined_bluefin_integratedv3_200914.wav', import.meta.url).href;
-  const eventsCsvUrl = new URL('../assets/remapped_bluefin_integrated_offsets_200914.csv', import.meta.url).href;
+  const audioAssetUrl = new URL('../assets/enhanced.wav', import.meta.url).href;
+  const eventsCsvUrl = new URL('../assets/offsets.csv', import.meta.url).href;
 
   let canvasParent: HTMLDivElement | null = null;
   let sketchInstance: any = null;

@@ -25,6 +25,19 @@
 			<span aria-hidden="true"><iconify-icon icon="lucide:moon"></iconify-icon></span>
 		</label>
 
+				<!-- Blue -->
+		<input
+			type="radio"
+			name="theme"
+			id="blue"
+			value="blue"
+			checked={currentTheme === 'blue'}
+			on:change={handleThemeChange}
+		/>
+		<label for="blue" title="Blue theme">
+			<span aria-hidden="true"><iconify-icon icon="ic:round-water"></iconify-icon></span>
+		</label>
+
 		<!-- Light -->
 		<input
 			type="radio"
@@ -36,19 +49,6 @@
 		/>
 		<label for="light" title="Light theme">
 			<span aria-hidden="true"><iconify-icon icon="lucide:sun"></iconify-icon></span>
-		</label>
-
-		<!-- Blue -->
-		<input
-			type="radio"
-			name="theme"
-			id="blue"
-			value="blue"
-			checked={currentTheme === 'blue'}
-			on:change={handleThemeChange}
-		/>
-		<label for="blue" title="Blue theme">
-			<span aria-hidden="true"><iconify-icon icon="ic:round-water"></iconify-icon></span>
 		</label>
 	</div>
 </div>

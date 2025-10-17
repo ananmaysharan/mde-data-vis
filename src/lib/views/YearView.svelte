@@ -263,11 +263,11 @@
 
     function getCircleProps(value) {
         if (value === null || value === undefined || value === '') {
-            return { size: 8, color: '#eeee', value: null, opacity: 1 };
+            return { size: 8, color: '#eee', value: null, opacity: 0 };
         }
         const numValue = Number(value);
         if (!Number.isFinite(numValue)) {
-            return { size: 8, color: '#eeeeee', value: null, opacity: 1 };
+            return { size: 8, color: '#eee', value: null, opacity: 0 };
         }
         if (numValue === 0) {
             return { size: 8, color: null, value: 0, opacity: 0.2 };
