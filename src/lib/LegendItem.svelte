@@ -152,7 +152,7 @@
     }
     
     $: color = colors[type] || '#999';
-    $: imageSrc = `/src/lib/assets/legend/${imageMap[type]}`;
+    $: imageSrc = `/assets/legend/${imageMap[type]}`;
     $: displayName = displayNames[type] || type;
 </script>
 
