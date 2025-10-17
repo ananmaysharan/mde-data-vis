@@ -13,6 +13,7 @@
 
 <svelte:head>
 	<link rel="icon" href={favicon} />
+	<title>Ocean Records</title>
 </svelte:head>
 
 <div class="app-shell flex min-h-screen flex-col bg-surface-1 text-text-primary transition-colors duration-200">
