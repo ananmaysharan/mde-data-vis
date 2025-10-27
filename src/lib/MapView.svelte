@@ -789,9 +789,9 @@ const dayOverlayFormatter = new Intl.DateTimeFormat(undefined, {
 	<div class="map-container" bind:this={mapContainer}></div>
 
 	{#if mode === 'sidebar'}
-		<div class="map-gradient-overlay"></div>
+		<div class="map-gradient-overlay" in:fade={{ duration: 300, delay: 1000 }}></div>
 	{/if}
-
+	
 	{#if mode === 'intro' && showEnterButton}
 		<div class="enter-overlay" transition:fade={{ duration: ENTER_TRANSITION_DURATION }}>
 		<div class="flex flex-col items-center gap-6">
@@ -808,11 +808,9 @@ const dayOverlayFormatter = new Intl.DateTimeFormat(undefined, {
 	{#if mode === 'sidebar' && $selectedDay}
 		<div class="day-overlay">
 			<div class="day-overlay__content">
-				{#if dayOverlayLabel}
 					<header class="day-header">
-						<h1 class="font-mono">{dayOverlayLabel}</h1>
+						<h1 class="font-mono">SanctSound Detections</h1>
 					</header>
-				{/if}
 				{#if dayOverlayCard}
 					<DayCardPreview card={dayOverlayCard} />
 				{/if}

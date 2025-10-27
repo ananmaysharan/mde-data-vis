@@ -817,9 +817,9 @@
   </div>
 
   {#if formattedDate}
-    <!-- <header class="day-header">
-      <h1 class="font-mono">{formattedDate}</h1>
-    </header> -->
+    <header class="day-header">
+      <h1 class="font-mono">{formattedDate} | Perch Detections</h1>
+    </header>
       <div class="sketch-canvas" bind:this={canvasParent}></div>
   {:else}
     <article class="empty-state">
